@@ -16,6 +16,22 @@ vector<double> mainGrid(double a, double b, int n)
     }
     return x;
 }
+double p(double x)
+{
+    return (4 - x) / (5 - 2*x);
+}
+double q(double x)
+{
+    return (1 - x) / 2;
+}
+double r(double x)
+{
+    return 1* log(3 + x) / 2;
+}
+double f(double x)
+{
+    return 1 + x / 3;
+}
 
 int main()
 {
