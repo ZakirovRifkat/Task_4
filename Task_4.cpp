@@ -158,7 +158,18 @@ vector<vector<double>> sweep_method(vector<vector<double>> coef, int size)
     }
     return solution;
 }
-
+vector<double> Richardson(vector<vector<double>> table, int size, int s)
+{
+    vector<double> y_i(size), solve(size/2);
+    vector<double> R(size/2);
+    for (int i = 0; i < size; i++)
+        y_i[i] = table[6][i];
+    for (int i = 0; i < size/2; i++)
+        R[i] = (y_i[2*i+1] - y_i[2*i]) / (pow(2,s) - 1);
+    for (int i = 0; i < size/2; i++)
+        solve[i] = y_i[2 * i + 1] + R[i];
+    return solve;
+}
 int main()
 {
     setlocale(LC_ALL, "Russian");
@@ -167,7 +178,7 @@ int main()
     int choise = 0;
     char op = '+';
     double a = -1, b = 1, n = 0, h, alpha_1 = 1, beta_1 = 1, alpha = 0 , beta= 0;
-    vector<double> x, offset_x;
+    vector<double> x, extrapol;
     vector<vector<double>> coefficients, final_table;
 
     cout << "\nГраницы отрезка: [ -1; 1 ]\n";
@@ -185,12 +196,26 @@ int main()
             coefficients = coef_1(x, h, alpha_1, beta_1, alpha, beta);
             final_table = sweep_method(coefficients, x.size());
             show(final_table, x);
+            if (n == 20)
+            {
+                cout << "Экстраполяция по Ричардсону:\n";
+                extrapol = Richardson(final_table, x.size(), 1);
+                for (int i = 0; i < extrapol.size(); i++)
+                    cout << "\t|" << setw(12) << extrapol[i] << "|\n";
+            }
             break;
         case 2:
             x = offsetGrid(a, b, n);
             coefficients = coef_2(x, h, alpha_1, beta_1, alpha, beta);
             final_table = sweep_method(coefficients, x.size());
             show(final_table, x);
+            if (n == 20)
+            {
+                cout << "Экстраполяция по Ричардсону:\n";
+                extrapol = Richardson(final_table, x.size(), 2);
+                for (int i = 0; i < extrapol.size(); i++)
+                    cout << "\t|" << setw(12) << extrapol[i] << "|\n";
+            }
             break;
         }
         for (int i = 0; i < x.size(); i++)
@@ -204,12 +229,6 @@ int main()
         cout << "\nПродолжим? +/-\n";
         cin >> op;
     }
-
-
-    
-
-   
-
     return 0;
 }
 
