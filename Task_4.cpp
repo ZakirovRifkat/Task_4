@@ -167,7 +167,7 @@ int main()
     int choise = 0;
     char op = '+';
     double a = -1, b = 1, n = 0, h, alpha_1 = 1, beta_1 = 1, alpha = 0 , beta= 0;
-    vector<double> x;
+    vector<double> x, offset_x;
     vector<vector<double>> coefficients, final_table;
 
     cout << "\nГраницы отрезка: [ -1; 1 ]\n";
@@ -204,6 +204,12 @@ int main()
         cout << "\nПродолжим? +/-\n";
         cin >> op;
     }
+
+
+    
+
+   
+
     return 0;
 }
 
