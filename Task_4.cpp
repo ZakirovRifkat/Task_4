@@ -5,6 +5,38 @@
 
 using namespace std;
 
+void show(vector<vector<double>> solve, vector<double> grid)
+{
+    for (int i = 0; i < grid.size(); i++)
+        cout << "\t" << grid[i] << "|" << solve[0][i] << "|" << solve[1][i] << "|" << solve[2][i] << "|" << solve[3][i] << "|" << solve[4][i] << "|" << solve[5][i] << "|" << solve[6][i]<<"\n";
+}
+void clear(vector<vector<double>> table, vector<vector<double>> coefficients, vector<double> x)
+{
+    for (int i = 0; i < x.size(); i++)
+    {
+        x[i] = 0;
+        for (int j = 0; j < coefficients.size(); j++)
+            coefficients[j][i] = 0;
+        for (int j = 0; j < table.size(); j++)
+            table[j][i] = 0;
+    }
+}
+double p(double x)
+{
+    return (4 - x) / (5 - 2 * x);
+}
+double q(double x)
+{
+    return (1 - x) / 2;
+}
+double r(double x)
+{
+    return 1 * log(3 + x) / 2;
+}
+double f(double x)
+{
+    return 1 + x / 3;
+}
 vector<double> mainGrid(double a, double b, double h)
 {
     vector<double> x;
@@ -23,22 +55,6 @@ vector<double> offsetGrid(double a, double b, int n)
         x[i] = a - h / 2 + i * h;
     x[n + 1] = b + h / 2;
     return x;
-}
-double p(double x)
-{
-    return (4 - x) / (5 - 2*x);
-}
-double q(double x)
-{
-    return (1 - x) / 2;
-}
-double r(double x)
-{
-    return 1* log(3 + x) / 2;
-}
-double f(double x)
-{
-    return 1 + x / 3;
 }
 vector<vector<double>> coef_1(vector<double> grid,double h, double a_1, double b_1, double a, double b)
 {
@@ -98,25 +114,91 @@ vector<vector<double>> coef_2(vector<double> offset_grid, double h, double a_1, 
     }
     return table;
 }
-
+vector<vector<double>> sweep_method(vector<vector<double>> coef, int size)
+{
+    int n = size;
+    vector<double> s(n), t(n), y(n);
+    vector<double> A(n), B(n), C(n), G(n);
+    vector<vector<double>> solution(7, vector<double>(n));
+    for (int i = 0; i < n; i++)
+    {
+        A[i] = (coef[0][i]);
+        B[i] = (coef[1][i]);
+        C[i] = (coef[2][i]);
+        G[i] = (coef[3][i]);
+    }
+    s[0] = (C[0] / B[0]);
+    t[0] = (-G[0] / B[0]);
+    for (int i = 1; i < n; i++)
+    {
+        s[i] = (C[i] / (B[i] - A[i] * s[i - 1]));
+        t[i] = ((A[i] * t[i - 1] - G[i]) / (B[i] - A[i] * s[i - 1]));
+    }
+    y[n - 1] = t[n - 1];
+    for (int i = n - 2; i >= 0; i--)
+        y[i] = s[i] * y[i + 1] + t[i];
+    for (int i = 0; i < n; i++)
+    {
+        solution[0][i] = A[i];
+        solution[1][i] = B[i];
+        solution[2][i] = C[i];
+        solution[3][i] = G[i];
+        solution[4][i] = s[i];
+        solution[5][i] = t[i];
+        solution[6][i] = y[i];
+    }
+    return solution;
+}
 int main()
 {
     setlocale(LC_ALL, "Russian");
     cout << "Задание 4. Разностный метод решения краевой задачи для ОДУ 2-го порядка. Вариант 8.\n"
         << "Уравнение вида: \np(x) = (4-x)/(5-2x); \nq(x) = (1-x)/2; \nr(x) = 1/2*ln(3+x); \nf(x) = 1+x/3 \nu(-1) = u(1) = 0";
-
+    int choise = 0;
+    char op = '+';
     double a = -1, b = 1, n = 0, h, alpha_1 = 1, beta_1 = 1, alpha = 0 , beta= 0;
     vector<double> x, offset_x;
-    vector<vector<double>> table_1, table_2;
+    vector<vector<double>> coefficients, final_table;
 
     cout << "\nГраницы отрезка: [ -1; 1 ]\n";
    /*     << "a = "; cin >> a; cout << "b = "; cin >> b;*/
-    cout << "Введите число разбиений n = "; cin >> n;
-    h = (b - a) / n;
-    x = mainGrid(a, b, h);
-    offset_x = offsetGrid(a, b, n);
-    table_1 = coef_1(x, h, alpha_1, beta_1, alpha, beta);
-    table_2 = coef_2(offset_x, h, alpha_1, beta_1, alpha, beta);
+    while (op != '-')
+    {
+        cout << "Введите число разбиений n = "; cin >> n;
+        h = (b - a) / n;
+        cout << "Выберите точность:\n1) О(h)\n2) O(h^2)\n";
+        cin >> choise;
+        switch (choise)
+        {
+        case 1:
+            x = mainGrid(a, b, h);
+            coefficients = coef_1(x, h, alpha_1, beta_1, alpha, beta);
+            final_table = sweep_method(coefficients, x.size());
+            show(final_table, x);
+            break;
+        case 2:
+            x = offsetGrid(a, b, n);
+            coefficients = coef_2(x, h, alpha_1, beta_1, alpha, beta);
+            final_table = sweep_method(coefficients, x.size());
+            show(final_table, x);
+            break;
+        }
+        for (int i = 0; i < x.size(); i++)
+        {
+            x[i] = 0;
+            for(int j=0; j<coefficients.size();j++)          
+                coefficients[j][i] = 0;
+            for (int j = 0; j < coefficients.size(); j++)
+                final_table[j][i] = 0;
+        }
+        cout << "\nПродолжим? +/-\n";
+        cin >> op;
+    }
+
+
+    
+
+   
 
     return 0;
 }
