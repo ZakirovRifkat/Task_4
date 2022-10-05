@@ -2,13 +2,22 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
 void show(vector<vector<double>> solve, vector<double> grid)
 {
     for (int i = 0; i < grid.size(); i++)
-        cout << "\t" << grid[i] << "|" << solve[0][i] << "|" << solve[1][i] << "|" << solve[2][i] << "|" << solve[3][i] << "|" << solve[4][i] << "|" << solve[5][i] << "|" << solve[6][i]<<"\n";
+        cout << "\t|" <<setw(12) << grid[i]
+        << "|" << setw(10) << solve[0][i]
+        << "|" << setw(10) << solve[1][i]
+        << "|" << setw(10) << solve[2][i]
+        << "|" << setw(10) << solve[3][i]
+        << "|" << setw(10) << solve[4][i]
+        << "|" << setw(10) << solve[5][i]
+        << "|" << setw(10) << solve[6][i]
+        <<"|\n";
 }
 void clear(vector<vector<double>> table, vector<vector<double>> coefficients, vector<double> x)
 {
@@ -149,6 +158,7 @@ vector<vector<double>> sweep_method(vector<vector<double>> coef, int size)
     }
     return solution;
 }
+
 int main()
 {
     setlocale(LC_ALL, "Russian");
